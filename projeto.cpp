@@ -15,7 +15,7 @@ void iniciarNotas(int (&notas)[1000][5], int &totalAlunos)
     }
 
     string linha;
-    totalAlunos = 0;  
+    totalAlunos = 0;
 
     while (getline(leitura, linha))
     {
@@ -61,7 +61,7 @@ bool apenasNumeros(const string &str)
   return true;
 }
 
-string cadastrarAluno()
+string cadastrarAluno(int& totalAlunos)
 {
   ofstream arquivo("alunos.txt", ios::app);
   if (!arquivo.is_open())
@@ -99,6 +99,7 @@ string cadastrarAluno()
   arquivo << entrada << endl;
   arquivo.close();
   cout << "Aluno cadastrado com sucesso.\n";
+  totalAlunos++;
 
   return entrada;
 }
@@ -154,7 +155,7 @@ int main()
     switch (menu)
     {
     case 1:
-      cadastrarAluno();
+      cadastrarAluno(totalAlunos);
       break;
     case 2:
       cadastrarTurma();
