@@ -7,13 +7,27 @@ using namespace std;
 
 void iniciarNotas(int (&notas)[1000][5], int &totalAlunos)
 {
-  ifstream leitura("notas.txt");
-  if(!leitura.is_open())
-  {
-    cerr << "Erro ao abrir arquivo, reinicie o programa!" << endl;
-    return;
-  }
+    ifstream leitura("notas.txt");
+    if (!leitura.is_open())
+    {
+        cerr << "Erro ao abrir arquivo, reinicie o programa!" << endl;
+        return;
+    }
+
     string linha;
+    totalAlunos = 0;  
+
+    while (getline(leitura, linha))
+    {
+        stringstream ss(linha);
+        for (int j = 0; j < 5; j++)
+        {
+            ss >> notas[totalAlunos][j];
+        }
+        totalAlunos++;
+    }
+
+    leitura.close();
 }
 void mostrarMenu()
 {
