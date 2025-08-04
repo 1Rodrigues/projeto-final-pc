@@ -130,7 +130,7 @@ void armazenarNotas(int (&notas)[][5], int totalAlunos)
   }
   for(int i = totalAlunos; i < totalAlunos + 1; i++)
   {
-    cout << "Preencha o campo de notas (turma-aluno-n1-n2-n3): " << endl;
+    cout << "Preencha o campo de notas (cod da materia cod aluno n1 n2 n3): " << endl;
     for(int j = 0; j < 5; j++)
     {
       cin >> notas[i][j];
@@ -140,6 +140,67 @@ void armazenarNotas(int (&notas)[][5], int totalAlunos)
   }
   arquivo.close();
   cout << "Notas armazenadas!" << endl;
+}
+double calcularMedia(int n1, int n2, int n3)
+{
+  return (n1+n2+n3) / 3.0;
+}
+void mediasPorAluno(int codAluno)
+{
+  ifstream leitura("notas.txt");
+  if(!leitura.is_open())
+  {
+    cerr << "Erro ao abrir arquivo de notas!";
+    return;
+  }
+  int codDisciplina, codaluno, n1, n2, n3;
+  double media;
+  bool achou = false;
+
+  cout << "O aluno " << codAluno << " tem medias: " << endl;
+  while(leitura >> codDisciplina >> codaluno >> n1 >> n2 >> n3)
+  {
+    if(codaluno == codAluno)
+    {
+      media = calcularMedia(n1, n2, n3);
+      cout << "Disciplina " << codDisciplina
+             << " - Notas: " << n1 << ", " << n2 << ", " << n3
+             << " - Média: " << media << endl;
+      achou = true;
+    }
+  }
+  if(!achou)
+  {
+    cout << "O codigo não corresponde a um aluno cadastrado!";
+  }
+  leitura.close();
+}
+void notasPorDisciplina(int codDisciplina)
+{
+  ifstream leitura("notas.txt");
+  if(!leitura.is_open())
+  {
+    cerr << "Erro ao abrir notas";
+    return;
+  }
+  int coddisc, codalumn, n1, n2, n3;
+  int soma = 0;
+  int totalNotas = 0;
+  double media;
+
+  while(leitura >> coddisc >> codalumn >> n1 >> n2 >> n3)
+  {
+    if(coddisc == codDisciplina)
+    {
+      soma += n1;
+      soma += n2;
+      soma += n3;
+      totalNotas += 3;
+    }
+  }
+  media = soma / totalNotas;
+  cout << "A disciplina " << codDisciplina << " tem media: " << media << endl;
+
 }
 int main()
 {
@@ -163,6 +224,25 @@ int main()
     case 3:
       armazenarNotas(notas, totalAlunos);
       break;
+    case 4:
+    {
+      int opcao, codA, codD;
+      cout << "Digite 1 para  ver as medias de um aluno ou 2 para ver as medias de uma  ";
+      cin >> opcao;
+      if(opcao == 1)
+      {
+        cout << "Qual o código do aluno buscado? ";
+        cin >> codA;
+        mediasPorAluno(codA);
+      }
+      if(opcao == 2)
+      {
+        cout << "Qual o código da disciplina buscada? ";
+        cin >> codD;
+
+        notasPorDisciplina(codD);
+      }
+    }
     case 7:
       cout << "Encerrando programa.\n";
       break;
