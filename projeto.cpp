@@ -31,14 +31,15 @@ void iniciarNotas(int (&notas)[1000][5], int &totalAlunos)
 }
 void mostrarMenu()
 {
-  cout << "Escolha a opção desejada: " << endl;
+  cout << "Escolha a opcao desejada: " << endl;
   cout << "1: Cadastrar novo aluno" << endl;
   cout << "2: Cadastrar nova disciplina" << endl;
   cout << "3: inserir notas" << endl;
-  cout << "4: Calcular média" << endl;
+  cout << "4: Calcular media" << endl;
   cout << "5: Consultar notas" << endl;
-  cout << "6: Relatório" << endl;
-  cout << "7: Encerrar programa" << endl;
+  cout << "6: Relatorio" << endl;
+  cout << "7: Mostrar relatorio criado" << endl;
+  cout << "8: Encerrar programa" << endl;
 }
 
 bool apenasLetras(const string &str)
@@ -66,7 +67,7 @@ string cadastrarAluno(int& totalAlunos)
   ofstream arquivo("alunos.txt", ios::app);
   if (!arquivo.is_open())
   {
-    cerr << "Erro ao abrir o arquivo\n";
+    cerr << "Erro ao abrir o arquivo" << endl;
     return "";
   }
 
@@ -80,19 +81,19 @@ string cadastrarAluno(int& totalAlunos)
 
   if (!getline(ss, nome, '-') || !getline(ss, matricula, '-') || !getline(ss, turma, '-'))
   {
-    cout << "Formato inválido. Use nome-matricula-turma\n";
+    cout << "Formato invalido. Use nome-matricula-turma\n";
     return "";
   }
 
   if (!apenasLetras(nome))
   {
-    cout << "Nome inválido. Deve conter apenas letras.\n";
+    cout << "Nome invalido. Deve conter apenas letras.\n";
     return "";
   }
 
   if (!apenasNumeros(matricula))
   {
-    cout << "Matrícula inválida. Deve conter apenas números.\n";
+    cout << "Matricula invalida. Deve conter apenas números.\n";
     return "";
   }
 
@@ -103,6 +104,7 @@ string cadastrarAluno(int& totalAlunos)
 
   return entrada;
 }
+
 string cadastrarTurma()
 {
   ofstream arquivo("disciplinas.txt", ios::app);
@@ -120,7 +122,7 @@ string cadastrarTurma()
   cout << "Disciplina adicionada com sucesso!" << endl;
   return turma;
 }
-void armazenarNotas(int (&notas)[][5], int totalAlunos)
+void armazenarNotas(int (&notas)[1000][5], int totalAlunos)
 {
   ofstream arquivo("notas.txt", ios::app);
   if(!arquivo.is_open())
@@ -141,10 +143,12 @@ void armazenarNotas(int (&notas)[][5], int totalAlunos)
   arquivo.close();
   cout << "Notas armazenadas!" << endl;
 }
+
 double calcularMedia(int n1, int n2, int n3)
 {
   return (n1+n2+n3) / 3.0;
 }
+
 void mediasPorAluno(int codAluno)
 {
   ifstream leitura("notas.txt");
@@ -165,14 +169,15 @@ void mediasPorAluno(int codAluno)
       media = calcularMedia(n1, n2, n3);
       cout << "Disciplina " << codDisciplina
              << " - Notas: " << n1 << ", " << n2 << ", " << n3
-             << " - Média: " << media << endl;
+             << " - Media: " << media << endl;
       achou = true;
     }
   }
   if(!achou)
   {
-    cout << "O codigo não corresponde a um aluno cadastrado!";
+    cout << "O codigo nao corresponde a um aluno cadastrado!";
   }
+
   leitura.close();
 }
 void notasPorDisciplina(int codDisciplina)
@@ -202,6 +207,117 @@ void notasPorDisciplina(int codDisciplina)
   cout << "A disciplina " << codDisciplina << " tem media: " << media << endl;
 
 }
+
+  void consultarnotasAlunoDiciplinas(int codAluno) {
+    
+  ifstream leitura("notas.txt");
+  if(!leitura.is_open())
+  {
+    cerr << "Erro ao abrir notas";
+    return;
+  }
+  int coddisc, codalumn,n1,n2,n3;
+  bool achou=false;
+  
+  cout << "o aluno " << codAluno << " na diciplina " << coddisc << " possui as notas:" << endl;
+    while (leitura >>coddisc >> codalumn >> n1 >> n2 >> n3) {
+      if (codalumn == codAluno ) {
+        cout << "diciplinas " << coddisc << "-Notas: " << n1 << ", " << n2 << ", " << n3 << endl;
+        cout << "media: " << calcularMedia(n1,n2,n3) << endl;
+        achou = true;
+      }
+    }
+    if (!achou) {
+      cout << "nenhum aluno cadastrado com o codigo informado " << codalumn <<endl;
+    }
+   leitura.close();
+  }
+  void consultarNotasDiciplinas(int codDisciplina) {
+     ifstream leitura("notas.txt");
+  if(!leitura.is_open())
+  {
+    cerr << "Erro ao abrir notas";
+    return;
+  }
+  int coddisc, codalumn,n1,n2,n3;
+  bool achou=false;
+  
+  cout << "A disciplina "  << codDisciplina << " possui as notas dos alunos:" << endl;
+    while (leitura >>coddisc >> codalumn >> n1 >> n2 >> n3) {
+      if (coddisc == codDisciplina ) {
+        cout << "alunos " << codalumn << "-Notas: " << n1 << ", " << n2 << ", " << n3 << endl;
+        cout << "media: " << calcularMedia(n1,n2,n3) << endl;
+        achou = true;
+      }
+    }
+    if (!achou) {
+      cout << "nenhuma nota para essa disciplina " << coddisc << endl;
+    }
+   leitura.close();
+  
+
+  }
+
+  void criarRelatorio(){
+    ifstream leitura("notas.txt");
+    if (!leitura.is_open())
+    { cerr << "erro ao abrir arquivo << endl";
+    return;
+    }
+    const int maxRegistros=1000;
+    int coddisc[maxRegistros], codAlunm[maxRegistros],media[maxRegistros], n1[maxRegistros], n2[maxRegistros], n3[maxRegistros];
+    int total=0;
+    while (leitura >> coddisc[total] >> codAlunm[total] >> media[total] >> n1[total] >> n2[total] >> n3[total]){
+      total++;
+      if (total >= maxRegistros) break;
+    }
+    string relatorio = "relatorio";
+    for (int i=0; i < total; i++) {
+      float media = (n1[i] + n2[i] + n3[i]) / 3.0;
+         relatorio += "Aluno: " + to_string(codAlunm[i]) +
+                 " | Disciplina: " + to_string(coddisc[i]) +
+                 " | Notas: " + to_string(n1[i]) + ", " + to_string(n2[i]) + ", " + to_string(n3[i]) +
+                 " | Média: " + to_string(media).substr(0, 5) + " "  ;
+    }
+    leitura.close();
+    if (total ==0) {
+      cout << "nenhum registro encontrado" << endl;
+      return;
+    }
+    int gerarouexibir;
+    cout << "digite 1 se voce quiser exibir o relatorio, 2 se quiser transformar em txt" << endl;
+    cin >> gerarouexibir;
+    if (gerarouexibir==1){
+      cout << " " << relatorio << endl;
+    }
+    if(gerarouexibir==2){
+      ofstream saida("relatorio.txt");
+      if (!saida.is_open()){
+        cerr << "erro ao abrir arquivo de saida" << endl;
+        return;
+      }
+      saida << relatorio;
+      saida.close();
+      cout << "relaorio salvo com sucesso em relatorio.txt" << endl;
+    }
+    if (gerarouexibir != 1 && gerarouexibir!=2) 
+    { cout << "digite uma opcao valida" << endl; }
+
+  }
+  void mostrarRelatorio()
+  {
+    ifstream leitura("relatorio.txt");
+    if (!leitura.is_open()){
+      cerr << "erro ao abrir o arquivo dos  relatorios" << endl;
+      return;
+    }
+    string linha;
+    while (getline(leitura, linha))
+    {
+      cout << linha << endl;
+    }
+    leitura.close();
+  }
 int main()
 {
   int totalAlunos = 0;
@@ -227,7 +343,7 @@ int main()
     case 4:
     {
       int opcao, codA, codD;
-      cout << "Digite 1 para  ver as medias de um aluno ou 2 para ver as medias de uma  ";
+      cout << "Digite 1 para  ver as medias de um aluno ou 2 para ver as medias de uma diciplina ";
       cin >> opcao;
       if(opcao == 1)
       {
@@ -243,11 +359,44 @@ int main()
         notasPorDisciplina(codD);
       }
     }
-    case 7:
-      cout << "Encerrando programa.\n";
+    break;
+
+    case 5 :
+{
+    int opcao=0;
+    int codA, codD;
+    cout << "digite 1 para ver todas as notas de uma diciplina em especifico" << endl;
+     cout << "digite 2 para ver a nota de todos os alunos de uma diciplina" << endl;
+     cin >> opcao;
+     if (opcao==1)
+     {
+      cout << "digite o codigo do aluno: " << endl;
+      cin >>codA;
+      consultarnotasAlunoDiciplinas(codA);
+     }
+     if (opcao == 2) {
+      cout << "digite o codigo da diciplina: " << endl;
+      cin >>codD;
+      consultarNotasDiciplinas(codD);
+     }
+
+     if (opcao != 1 && opcao != 2){
+     cerr << "opcao selecionada invalida" << endl;
+     }
+   
+  }
+  break;
+  case 6: 
+    criarRelatorio();
+  break;
+  case 7:
+ mostrarRelatorio();
+  break;
+    case 8:
+      cout << "Encerrando programa." << endl;
       break;
     }
-  } while (menu != 7);
+  } while (menu != 8);
 
   return 0;
 }
