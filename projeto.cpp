@@ -258,32 +258,79 @@ void notasPorDisciplina(int codDisciplina)
 
   }
 
-  void criarRelatorio(){
-    ifstream leitura("notas.txt");
-    if (!leitura.is_open())
-    { cerr << "erro ao abrir arquivo << endl";
-    return;
+  void criarRelatorio(){ 
+    ifstream leituraNotas("notas.txt");
+    ifstream leituraAlunos("alunos.txt");
+    ifstream leituraDisciplinas("disciplinas.txt");
+
+    if (!leituraNotas.is_open() || !leituraAlunos.is_open() || !leituraDisciplinas.is_open()) {
+        cerr << "Erro ao abrir os arquivos necessários." << endl;
+        return;
     }
-    const int maxRegistros=1000;
-    int coddisc[maxRegistros], codAlunm[maxRegistros],media[maxRegistros], n1[maxRegistros], n2[maxRegistros], n3[maxRegistros];
-    int total=0;
-    while (leitura >> coddisc[total] >> codAlunm[total] >> media[total] >> n1[total] >> n2[total] >> n3[total]){
-      total++;
-      if (total >= maxRegistros) break;
+
+    string nomesAlunos[1000];
+    int codigosAlunos[1000];
+    int totalAlunos = 0;
+
+    string linha;
+    while (getline(leituraAlunos, linha)) {
+        stringstream ss(linha);
+        string nome, matricula, turma;
+        getline(ss, nome, '-');
+        getline(ss, matricula, '-');
+        getline(ss, turma, '-');
+        codigosAlunos[totalAlunos] = stoi(matricula);
+        nomesAlunos[totalAlunos] = nome;
+        totalAlunos++;
     }
-    string relatorio = "relatorio";
-    for (int i=0; i < total; i++) {
-      float media = (n1[i] + n2[i] + n3[i]) / 3.0;
-         relatorio += "Aluno: " + to_string(codAlunm[i]) +
-                 " | Disciplina: " + to_string(coddisc[i]) +
-                 " | Notas: " + to_string(n1[i]) + ", " + to_string(n2[i]) + ", " + to_string(n3[i]) +
-                 " | Média: " + to_string(media).substr(0, 5) + " "  ;
+
+    string nomesDisciplinas[1000];
+    int codigosDisciplinas[1000];
+    int totalDisciplinas = 0;
+
+    while (getline(leituraDisciplinas, linha)) {
+        stringstream ss(linha);
+        string nome, codigo;
+        getline(ss, nome, '-');
+        getline(ss, codigo, '-');
+        codigosDisciplinas[totalDisciplinas] = stoi(codigo);
+        nomesDisciplinas[totalDisciplinas] = nome;
+        totalDisciplinas++;
     }
-    leitura.close();
-    if (total ==0) {
-      cout << "nenhum registro encontrado" << endl;
-      return;
+
+    int codDisc, codAluno, n1, n2, n3;
+    string relatorio = "";
+
+    while (leituraNotas >> codDisc >> codAluno >> n1 >> n2 >> n3) {
+        string nomeAluno = "Desconhecido";
+        string nomeDisc = "Desconhecida";
+
+        for (int i = 0; i < totalAlunos; i++) {
+            if (codigosAlunos[i] == codAluno) {
+                nomeAluno = nomesAlunos[i];
+                break;
+            }
+        }
+
+        for (int i = 0; i < totalDisciplinas; i++) {
+            if (codigosDisciplinas[i] == codDisc) {
+                nomeDisc = nomesDisciplinas[i];
+                break;
+            }
+        }
+
+        float media = calcularMedia(n1, n2, n3);
+
+        relatorio += "Disciplina: " + nomeDisc + " (" + to_string(codDisc) + ")\n";
+        relatorio += "  Aluno: " + nomeAluno + " (" + to_string(codAluno) + ")\n";
+        relatorio += "    Notas: " + to_string(n1) + ", " + to_string(n2) + ", " + to_string(n3) + "\n";
+        relatorio += "    Média: " + to_string(media).substr(0, 5) + "\n\n";
     }
+
+    leituraNotas.close();
+    leituraAlunos.close();
+    leituraDisciplinas.close();
+
     int gerarouexibir;
     cout << "digite 1 se voce quiser exibir o relatorio, 2 se quiser transformar em txt" << endl;
     cin >> gerarouexibir;
